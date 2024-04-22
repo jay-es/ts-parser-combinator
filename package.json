@@ -1,0 +1,18 @@
+{
+  "name": "ts-parser-combinator",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "biome format ./src",
+    "lint": "biome lint ./src"
+  },
+  "keywords": [],
+  "author": "jay-es",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "1.7.0",
+    "@tsconfig/strictest": "^2.0.5",
+    "typescript": "^5.4.5"
+  }
+}
