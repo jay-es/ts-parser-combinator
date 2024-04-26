@@ -24,3 +24,16 @@ export const is: IsFunc = (f) => (input) => {
     rest: r.rest,
   };
 };
+
+// biome-ignore format:
+export type UpperAlphabet = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z';
+export type LowerAlphabet = Lowercase<UpperAlphabet>;
+export type Alphabet = UpperAlphabet | LowerAlphabet;
+
+export const upperAlpha = is((c): c is UpperAlphabet => /^[A-Z]$/.test(c));
+export const lowerAlpha = is((c): c is LowerAlphabet => /^[a-z]$/.test(c));
+export const alpha = is((c): c is Alphabet => /^[A-Za-z]$/.test(c));
+
+// biome-ignore format:
+export type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+export const digit = is((c): c is Digit => /^\d$/.test(c));
