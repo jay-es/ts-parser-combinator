@@ -1,5 +1,7 @@
 import type { Parser, ParserData, ParserOutput } from "./types";
+import { mapSuccess } from "./util";
 
+// not 演算子
 type NotFunc = (p: Parser<unknown>) => Parser<null>;
 export const not: NotFunc = (p) => (input) => {
   return p(input).result === "success"
@@ -7,39 +9,40 @@ export const not: NotFunc = (p) => (input) => {
     : { result: "success", data: null, rest: input };
 };
 
+// or 演算子
 type OrFunc = <T>(ps: Parser<T>[]) => Parser<T>;
 export const or: OrFunc = (ps) => (input) => {
-  return (
-    ps.map((p) => p(input)).find(({ result }) => result === "success") ?? {
-      result: "fail",
-    }
+  return ps.reduce<ReturnType<(typeof ps)[number]>>(
+    (acc, p) => (acc.result === "fail" ? p(input) : acc),
+    { result: "fail" },
   );
 };
 
+// 連結演算子
 type CatFunc = <T extends Parser<unknown>[]>(
   ps: [...T],
 ) => Parser<{ [K in keyof T]: ParserData<T[K]> }>;
 export const cat: CatFunc = (ps) => (input) => {
-  return ps.reduce(
+  // biome-ignore lint/suspicious/noExplicitAny: 型推論が効かない
+  return ps.reduce<ParserOutput<any>>(
     (acc, p) => {
-      if (acc.result === "fail") return acc;
-      const r = p(acc.rest);
-      if (r.result === "fail") return r;
+      if (acc.result === "fail") {
+        return acc;
+      }
 
-      return {
-        result: "success",
-        data: [...acc.data, r.data],
-        rest: r.rest,
-      };
+      const r = p(acc.rest);
+
+      return r.result === "success" ? mapSuccess(r, [...acc.data, r.data]) : r;
     },
     {
       result: "success",
       data: [],
       rest: input,
-    } as ParserOutput<never>,
+    },
   );
 };
 
+// 繰り返し演算子
 type RepFunc = <T>(p: Parser<T>, min?: number, max?: number) => Parser<T[]>;
 export const rep: RepFunc =
   (p, min = 0, max = Number.MAX_SAFE_INTEGER) =>

@@ -1,6 +1,6 @@
 export type ParserInput = readonly string[];
 
-interface ParseSuccess<T> {
+export interface ParseSuccess<T> {
   result: "success";
   data: T;
   rest: ParserInput;
